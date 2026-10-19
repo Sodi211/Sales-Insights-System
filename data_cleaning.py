@@ -1,113 +1,99 @@
-"""
-data_cleaning.py
------------------
-Task 2: Load the raw CSV files and clean them.
-
-This module covers KM-04 topics: Introduction to Data (data types,
-errors of omission) and Data in Spreadsheets.
-
-The raw files in data/products.csv and data/sales.csv contain REAL
-data-quality problems on purpose, so you get practice fixing them:
-
-  products.csv issues to find and fix:
-    - Some products are missing a unit_price
-    - One product is missing its product_name
-    - Category text is inconsistently capitalised (e.g. "beverages" vs "Beverages")
-    - One exact duplicate row
-
-  sales.csv issues to find and fix:
-    - sale_date is written in at least FOUR different formats
-    - Some rows have a missing sale_date (an error of omission)
-    - Some rows have a missing quantity
-    - Some rows have a missing payment_method
-    - A few rows reference a product_id that does not exist in products.csv
-    - One exact duplicate row
-
-You must handle every one of these before the data moves on to the
-database in database.py. Document the decisions you make (e.g. "rows
-with a missing sale_date were dropped because we cannot analyse sales
-trends without a date") in your README findings section.
-"""
+"""Task 2: load and clean the corner store's product and sales CSV data."""
 
 import pandas as pd
 
 
+DATE_FORMATS = ("%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%d-%m-%Y")
+
+
 def load_raw_data(products_path: str, sales_path: str):
-    """
-    Load the two raw CSV files into pandas DataFrames.
-
-    Args:
-        products_path: file path to products.csv
-        sales_path: file path to sales.csv
-
-    Returns:
-        (products_df, sales_df) tuple of pandas DataFrames, UNCLEANED.
-    """
-    # TODO:
-    #   1. Use pd.read_csv() to load both files.
-    #   2. Return them as a tuple: (products_df, sales_df)
-    raise NotImplementedError
+    """Read both CSV files without making any cleaning changes."""
+    products_df = pd.read_csv(products_path)
+    sales_df = pd.read_csv(sales_path)
+    return products_df, sales_df
 
 
 def clean_products(products_df: "pd.DataFrame") -> "pd.DataFrame":
-    """
-    Clean the products DataFrame.
+    """Return products with valid names/prices, consistent categories and unique IDs."""
+    products = products_df.copy()
+    products = products.drop_duplicates()
 
-    Must handle:
-        - Missing unit_price (decide: drop the row, or fill with a sensible
-          value? Justify your choice in the README.)
-        - Missing product_name (a product with no name is not usable data —
-          what should happen to that row?)
-        - Inconsistent category capitalisation (standardise to Title Case,
-          e.g. "beverages" -> "Beverages")
-        - Duplicate rows (remove them)
+    # Blank text should count as missing, not as a valid product name.
+    for column in ("product_id", "product_name", "category"):
+        products[column] = products[column].astype("string").str.strip()
+        products[column] = products[column].replace("", pd.NA)
 
-    Returns:
-        A cleaned copy of the DataFrame. Do not modify products_df in place.
-    """
-    # TODO: implement the cleaning steps described above.
-    raise NotImplementedError
+    products["unit_price"] = pd.to_numeric(products["unit_price"], errors="coerce")
+    products = products.dropna(subset=["product_id", "product_name", "category", "unit_price"])
+    products = products[products["unit_price"] >= 0].copy()
+    products["category"] = products["category"].str.title()
+
+    # The database needs each product_id to be unique.
+    products = products.drop_duplicates(subset=["product_id"], keep="first")
+    return products.reset_index(drop=True)
+
+
+def _standardise_date(value):
+    """Parse known formats explicitly; ambiguous numeric dates are day-first."""
+    if pd.isna(value) or not str(value).strip():
+        return None
+    date_text = str(value).strip()
+    for date_format in DATE_FORMATS:
+        try:
+            return pd.to_datetime(date_text, format=date_format, errors="raise").strftime("%Y-%m-%d")
+        except (ValueError, TypeError):
+            continue
+    return None
 
 
 def clean_sales(sales_df: "pd.DataFrame", valid_product_ids) -> "pd.DataFrame":
-    """
-    Clean the sales DataFrame.
+    """Return dated, valid sales linked to cleaned products."""
+    sales = sales_df.copy()
+    sales = sales.drop_duplicates()
 
-    Args:
-        sales_df: the raw sales DataFrame
-        valid_product_ids: a collection of product_id values that exist
-            in the cleaned products table (use this to catch invalid /
-            mistyped product references)
+    for column in ("sale_id", "product_id", "payment_method", "customer_type"):
+        sales[column] = sales[column].astype("string").str.strip().replace("", pd.NA)
 
-    Must handle:
-        - Standardise sale_date to a single format: YYYY-MM-DD
-          (hint: pandas.to_datetime() can parse several formats if you
-          pass them one at a time, or try errors="coerce" and inspect
-          what fails)
-        - Rows with a missing or unparseable sale_date
-        - Rows with a missing quantity
-        - Rows with a missing payment_method (what's a sensible default?
-          "Unknown" is a common, honest choice — don't guess a specific method)
-        - Rows whose product_id is NOT in valid_product_ids
-        - Duplicate rows
+    sales["quantity"] = pd.to_numeric(sales["quantity"], errors="coerce")
+    sales["sale_date"] = sales["sale_date"].map(_standardise_date)
 
-    Returns:
-        A cleaned copy of the DataFrame with a standardised sale_date
-        column (as a string in YYYY-MM-DD format) and no missing values
-        in quantity or product_id.
-    """
-    # TODO: implement the cleaning steps described above.
-    raise NotImplementedError
+    # A sale must have a date, a product, an ID and a positive whole-number quantity.
+    sales = sales.dropna(subset=["sale_id", "product_id", "quantity", "sale_date"])
+    sales = sales[(sales["quantity"] > 0) & (sales["quantity"] % 1 == 0)].copy()
+    sales = sales[sales["product_id"].isin(set(valid_product_ids))].copy()
+
+    # Preserve transactions when only optional descriptive fields are missing.
+    sales["payment_method"] = sales["payment_method"].fillna("Unknown")
+    sales["customer_type"] = sales["customer_type"].fillna("Unknown")
+    sales = sales.drop_duplicates(subset=["sale_id"], keep="first")
+    sales["quantity"] = sales["quantity"].astype(int)
+    return sales.reset_index(drop=True)
 
 
 def cleaning_summary(raw_df: "pd.DataFrame", clean_df: "pd.DataFrame", name: str) -> str:
-    """
-    Build a short, human-readable string summarising how many rows were
-    removed or changed during cleaning. You will paste this into your
-    README findings section.
+    """Summarise removed records; cleaned-in-place values do not change row counts."""
+    removed = len(raw_df) - len(clean_df)
+    return f"{name}: {len(raw_df)} raw rows -> {len(clean_df)} clean rows ({removed} removed)"
 
-    Example output:
-        "products: 16 raw rows -> 14 clean rows (2 removed)"
-    """
-    # TODO: compare len(raw_df) and len(clean_df) and format a message.
-    raise NotImplementedError
+    
+if __name__ == "__main__":
+    # Load the original datasets
+    products, sales = load_raw_data(
+        "data/products.csv",
+        "data/sales.csv"
+    )
+
+    # Clean the datasets
+    clean_p = clean_products(products)
+    clean_s = clean_sales(sales, clean_p["product_id"])
+
+    # Save the cleaned datasets as new CSV files
+    clean_p.to_csv("data/cleaned_products.csv", index=False)
+    clean_s.to_csv("data/cleaned_sales.csv", index=False)
+
+    # Display cleaning results
+    print(cleaning_summary(products, clean_p, "products"))
+    print(cleaning_summary(sales, clean_s, "sales"))
+
+    print("Cleaned CSV files saved successfully!")
+
