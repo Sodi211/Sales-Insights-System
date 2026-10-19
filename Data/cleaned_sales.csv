@@ -1,0 +1,44 @@
+sale_id,product_id,quantity,sale_date,payment_method,customer_type
+S0001,P011,1,2026-01-01,Cash,Walk-in
+S0002,P004,1,2026-01-02,Card,Walk-in
+S0003,P011,4,2026-01-03,Cash,Unknown
+S0005,P004,1,2026-01-05,Cash,Unknown
+S0007,P008,3,2026-01-07,Mobile Money,Walk-in
+S0011,P007,1,2026-01-11,Mobile Money,Walk-in
+S0012,P010,2,2026-01-12,Cash,Regular
+S0015,P004,4,2026-01-15,Cash,Walk-in
+S0016,P011,1,2026-01-16,Mobile Money,Walk-in
+S0017,P014,1,2026-01-17,Cash,Regular
+S0018,P005,2,2026-01-18,Mobile Money,Regular
+S0020,P012,4,2026-01-20,Cash,Unknown
+S0021,P011,1,2026-01-21,Card,Regular
+S0022,P008,2,2026-01-22,Mobile Money,Unknown
+S0023,P004,4,2026-01-23,Mobile Money,Walk-in
+S0025,P007,2,2026-01-25,Cash,Regular
+S0026,P015,3,2026-01-26,Mobile Money,Regular
+S0027,P011,2,2026-01-27,Unknown,Regular
+S0028,P003,2,2026-01-28,Card,Regular
+S0030,P007,3,2026-01-02,Unknown,Walk-in
+S0031,P004,1,2026-01-03,Unknown,Walk-in
+S0033,P011,1,2026-01-05,Unknown,Unknown
+S0035,P008,3,2026-01-07,Mobile Money,Unknown
+S0036,P014,1,2026-01-08,Cash,Unknown
+S0038,P005,2,2026-01-10,Card,Regular
+S0041,P014,4,2026-02-13,Card,Regular
+S0045,P015,2,2026-02-17,Mobile Money,Regular
+S0046,P001,1,2026-02-18,Cash,Walk-in
+S0047,P012,2,2026-02-19,Cash,Unknown
+S0050,P014,3,2026-02-22,Unknown,Regular
+S0051,P015,3,2026-02-23,Card,Walk-in
+S0052,P007,4,2026-02-24,Mobile Money,Regular
+S0055,P001,3,2026-02-27,Card,Unknown
+S0056,P004,1,2026-02-28,Cash,Walk-in
+S0057,P004,1,2026-02-01,Cash,Walk-in
+S0058,P002,3,2026-02-02,Card,Walk-in
+S0060,P003,4,2026-02-04,Unknown,Regular
+S0063,P007,2,2026-02-07,Unknown,Walk-in
+S0065,P007,4,2026-02-09,Mobile Money,Walk-in
+S0066,P004,1,2026-02-10,Card,Unknown
+S0067,P008,1,2026-02-11,Unknown,Regular
+S0068,P005,2,2026-02-12,Card,Walk-in
+S0070,P011,3,2026-02-14,Cash,Walk-in
