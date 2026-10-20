@@ -99,7 +99,10 @@ def query_total_revenue_per_product(conn: sqlite3.Connection):
     Execute it with conn.execute(sql) and return conn.execute(sql).fetchall()
     """
     sql = """
-    -- TODO: write your JOIN + GROUP BY + SUM query here
+    SELECT p.product_name, ROUND(SUM(s.quantity * p.unit_price), 2) AS revenue
+    FROM sales AS s JOIN products AS p ON s.product_id = p.product_id
+    GROUP BY p.product_id, p.product_name
+    ORDER BY revenue DESC, p.product_name;
     """
     raise NotImplementedError
 
@@ -111,7 +114,11 @@ def query_best_selling_product(conn: sqlite3.Connection):
     TODO: SUM(quantity) grouped by product, ORDER BY that sum DESC, LIMIT 1.
     """
     sql = """
-    -- TODO
+    SELECT p.product_name, SUM(s.quantity) AS units_sold
+    FROM sales AS s JOIN products AS p ON s.product_id = p.product_id
+    GROUP BY p.product_id, p.product_name
+    ORDER BY units_sold DESC, p.product_name
+    LIMIT 1;
     """
     raise NotImplementedError
 
@@ -123,26 +130,38 @@ def query_sales_by_payment_method(conn: sqlite3.Connection):
     TODO: COUNT(*) grouped by payment_method.
     """
     sql = """
-    -- TODO
+    SELECT payment_method, COUNT(*) AS transaction_count
+    FROM sales
+    GROUP BY payment_method;
     """
     raise NotImplementedError
 
 
 def query_custom_one(conn: sqlite3.Connection):
     """
-    Your own SQL query #1. Pick a business question that interests you,
-    e.g. "Which category earns the most revenue?" or "How many sales
-    were made to Regular customers vs Walk-in customers?"
-
-    Document the question you chose as the docstring above your SQL.
+    Product category that generates the highest sales revenue.
+    TODO: JOIN, SUM() and GROUP BY to calculate the total revenue for each category.
+    """
+    sql = """
+    SELECT p.category, ROUND(SUM(s.quantity * p.unit_price), 2) AS revenue
+    FROM sales AS s JOIN products AS p ON s.product_id = p.product_id
+    GROUP BY p.category
+    ORDER BY revenue DESC, p.category;
     """
     raise NotImplementedError
 
 
 def query_custom_two(conn: sqlite3.Connection):
     """
-    Your own SQL query #2. Choose a different type of question from
-    query_custom_one (e.g. use a WHERE filter, or a date range,
-    or a HAVING clause).
+    Find the five days with the highest sales revenue.
+    TODO: Uses JOIN, SUM, GROUP BY and ORDER BY.
     """
+    sql = """
+    SELECT s.sale_date, COUNT(*) AS transactions,
+    ROUND(SUM(s.quantity * p.unit_price), 2) AS revenue
+        FROM sales AS s JOIN products AS p ON s.product_id = p.product_id
+        GROUP BY s.sale_date
+        ORDER BY revenue DESC, s.sale_date
+        LIMIT 5;
+        """
     raise NotImplementedError
