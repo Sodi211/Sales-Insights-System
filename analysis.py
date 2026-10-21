@@ -14,6 +14,9 @@ fundamentals from KM-05, not just pandas shortcuts.
 """
 
 
+from ssl import ALERT_DESCRIPTION_BAD_CERTIFICATE_STATUS_RESPONSE, ALERT_DESCRIPTION_INSUFFICIENT_SECURITY
+
+
 def total_sales_records(sales_rows: list) -> int:
     """
     Count how many sales records there are, using a loop (not len()
@@ -26,61 +29,86 @@ def total_sales_records(sales_rows: list) -> int:
     Returns:
         the total number of records, as an integer, counted with a loop.
     """
-    # TODO:
-    #   count = 0
-    #   for row in sales_rows:
-    #       count += 1
-    #   return count
+    # TODO: Count sales records one at a time using a for loop.
+    count = 0
+    for row in sales_rows:
+        count += 1
+    return count
     raise NotImplementedError
+
 
 
 def low_stock_alert(products_rows: list, threshold: int = 5) -> list:
     """
-    Return a list of product names where in_stock is False, OR where
-    you decide a product should be flagged (use a conditional / if
-    statement here — this is the KM-05 "conditionals" checkpoint).
+    Return a list of product names that are out of stock
+    or have a stock quantity below the threshold.
 
-    Args:
-        products_rows: list of dictionaries, one per product
-        threshold: (optional) use this if you extend the dataset with
-            a stock-count column later
-
-    Returns:
-        a list of product_name strings that need re-ordering.
+    TODO: Use a for loop and if statements to identify
+    products that need restocking.
     """
-    # TODO:
-    #   alerts = []
-    #   for product in products_rows:
-    #       if product["in_stock"] is False:   # or == "False", check your data type
-    #           alerts.append(product["product_name"])
-    #   return alerts
-    raise NotImplementedError
+
+    alerts = []
+
+    for product in products_rows:
+        name = product.get("product_name", "Unknown product")
+        in_stock = product.get("in_stock")
+        stock_quantity = product.get("stock_quantity")
+
+        # TODO: Check whether the product is out of stock.
+        out_of_stock = False
+
+        if in_stock is False:
+            out_of_stock = True
+        elif isinstance(in_stock, str):
+            if in_stock.strip().lower() == "false":
+                out_of_stock = True
+
+        # TODO: Check whether the stock quantity is low.
+        low_stock = False
+
+        if stock_quantity is not None:
+            try:
+                if float(stock_quantity) <= threshold:
+                    low_stock = True
+            except (ValueError, TypeError):
+                pass
+
+        # TODO: Add products that need restocking.
+        if out_of_stock or low_stock:
+            alerts.append(name)
+
+    return alerts
+
 
 
 def monthly_sales_trend(sales_rows: list) -> dict:
     """
-    Build a dictionary that maps each month (e.g. "2026-01") to the
-    total quantity sold that month, using a loop.
-
-    Args:
-        sales_rows: list of dictionaries, one per sale, each with a
-            "sale_date" key already cleaned to "YYYY-MM-DD" format
-            and a "quantity" key (as an int)
-
-    Returns:
-        a dict like {"2026-01": 143, "2026-02": 97}
+    Calculate the total quantity of products sold each month.
 
     TODO:
-        trend = {}
-        for row in sales_rows:
-            month = row["sale_date"][:7]        # "YYYY-MM"
-            if month in trend:
-                trend[month] += row["quantity"]
-            else:
-                trend[month] = row["quantity"]
-        return trend
+        Use a for loop to go through the sales records.
+        Extract the year and month from each sale_date.
+        Add up the quantities sold for each month.
+        Return the monthly totals as a dictionary.
     """
-    raise NotImplementedError
+
+    trend = {}
+
+    for row in sales_rows:
+        # TODO: Extract the year and month.
+        month = str(row["sale_date"])[:7]
+
+        # TODO: Get the quantity sold.
+        quantity = int(row["quantity"])
+
+        # TODO: Add the quantity to the correct month.
+        if month in trend:
+            trend[month] += quantity
+        else:
+            trend[month] = quantity
+
+    return trend
+
 
 
 def classify_transaction_size(quantity: int) -> str:
@@ -95,6 +123,14 @@ def classify_transaction_size(quantity: int) -> str:
 
     TODO: implement the if / elif / else chain above.
     """
+    if quantity >=5:
+        return "Bulk"
+    elif quantity >=2:
+        return "Multiple"
+    elif quantity == 1:
+        return "Single"
+    else:
+        return "Invalid"
     raise NotImplementedError
 
 
@@ -104,12 +140,14 @@ def average_basket_size(sales_rows: list) -> float:
     loop to sum quantities and a loop (or len()) to count records.
 
     Returns:
-        a float rounded to 2 decimal places.
+        a float rounded to 2 decimal places."""
 
-    TODO:
-        total = 0
-        for row in sales_rows:
-            total += row["quantity"]
-        return round(total / len(sales_rows), 2)
-    """
+    # TODO: Calculate the average number of itemscount records per sale record.
+    Total_quantity = 0
+    Count = 0
+    for row in sales_rows:
+            Total_quantity += row["quantity"]
+            Count += 1
+    return round(Total_quantity / Count, 2)
+    
     raise NotImplementedError

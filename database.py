@@ -1,3 +1,4 @@
+
 """
 database.py
 ------------
@@ -20,15 +21,16 @@ By the end of this file you must be able to:
 import sqlite3
 
 
-def get_connection(db_path: str = "store.db") -> sqlite3.Connection:
+def get_connection(db_path: str):
     """
-    Open (and create, if needed) the SQLite database file.
+    Create a connection to the SQLite database.
+    """
+    conn = sqlite3.connect(db_path)
 
-    Returns:
-        an open sqlite3.Connection
-    """
-    # TODO: return sqlite3.connect(db_path)
-    raise NotImplementedError
+    # TODO: Enable foreign key constraints.
+    conn.execute("PRAGMA foreign_keys = ON")
+
+    return conn
 
 
 def create_tables(conn: sqlite3.Connection) -> None:
@@ -57,7 +59,29 @@ def create_tables(conn: sqlite3.Connection) -> None:
         and execute them using conn.execute(...). Remember to call
         conn.commit() at the end.
     """
-    raise NotImplementedError
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS products (
+            product_id TEXT PRIMARY KEY,
+            product_name TEXT NOT NULL,
+            category TEXT,
+            unit_price REAL
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS sales (
+            sale_id TEXT PRIMARY KEY,
+            product_id TEXT,
+            quantity INTEGER,
+            sale_date TEXT,
+            payment_method TEXT,
+            customer_type TEXT,
+            FOREIGN KEY (product_id) REFERENCES products(product_id)
+        )
+    """)
+
+    conn.commit()
 
 
 def insert_products(conn: sqlite3.Connection, products_df) -> None:
@@ -70,7 +94,20 @@ def insert_products(conn: sqlite3.Connection, products_df) -> None:
         products_df.to_sql("products", conn, if_exists="append", index=False))
         and insert each row. Remember conn.commit().
     """
-    raise NotImplementedError
+
+    for row in products_df.itertuples(index=False):
+        conn.execute("""
+            INSERT OR REPLACE INTO products
+            (product_id, product_name, category, unit_price)
+            VALUES (?, ?, ?, ?)
+        """, (
+            row.product_id,
+            row.product_name,
+            row.category,
+            row.unit_price
+        ))
+
+    conn.commit()
 
 
 def insert_sales(conn: sqlite3.Connection, sales_df) -> None:
@@ -79,7 +116,23 @@ def insert_sales(conn: sqlite3.Connection, sales_df) -> None:
 
     TODO: same approach as insert_products().
     """
-    raise NotImplementedError
+
+    for row in sales_df.itertuples(index=False):
+        conn.execute("""
+            INSERT OR REPLACE INTO sales
+            (sale_id, product_id, quantity, sale_date,
+             payment_method, customer_type)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (
+            row.sale_id,
+            row.product_id,
+            row.quantity,
+            row.sale_date,
+            row.payment_method,
+            row.customer_type
+        ))
+
+    conn.commit()
 
 
 # ---------------------------------------------------------------------
@@ -104,7 +157,8 @@ def query_total_revenue_per_product(conn: sqlite3.Connection):
     GROUP BY p.product_id, p.product_name
     ORDER BY revenue DESC, p.product_name;
     """
-    raise NotImplementedError
+
+    return conn.execute(sql).fetchall()
 
 
 def query_best_selling_product(conn: sqlite3.Connection):
@@ -120,7 +174,8 @@ def query_best_selling_product(conn: sqlite3.Connection):
     ORDER BY units_sold DESC, p.product_name
     LIMIT 1;
     """
-    raise NotImplementedError
+
+    return conn.execute(sql).fetchall()
 
 
 def query_sales_by_payment_method(conn: sqlite3.Connection):
@@ -134,7 +189,8 @@ def query_sales_by_payment_method(conn: sqlite3.Connection):
     FROM sales
     GROUP BY payment_method;
     """
-    raise NotImplementedError
+
+    return conn.execute(sql).fetchall()
 
 
 def query_custom_one(conn: sqlite3.Connection):
@@ -148,7 +204,8 @@ def query_custom_one(conn: sqlite3.Connection):
     GROUP BY p.category
     ORDER BY revenue DESC, p.category;
     """
-    raise NotImplementedError
+
+    return conn.execute(sql).fetchall()
 
 
 def query_custom_two(conn: sqlite3.Connection):
@@ -164,4 +221,5 @@ def query_custom_two(conn: sqlite3.Connection):
         ORDER BY revenue DESC, s.sale_date
         LIMIT 5;
         """
-    raise NotImplementedError
+
+    return conn.execute(sql).fetchall()

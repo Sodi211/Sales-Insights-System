@@ -19,47 +19,72 @@ in your submission.
 import matplotlib.pyplot as plt
 
 
-def bar_chart_revenue_per_product(product_names: list, revenues: list, save_path: str = "revenue_per_product.png"):
-    """
-    Create and save a bar chart of revenue per product.
 
-    Args:
-        product_names: list of product name strings (x-axis labels)
-        revenues: list of revenue numbers, same length and order as
-            product_names
-        save_path: where to save the .png file
+def bar_chart_revenue_per_product(names, revenues):
+    """
+    Create a bar chart showing total revenue per product.
 
     TODO:
-        plt.figure(figsize=(10, 6))
-        plt.bar(product_names, revenues)
-        plt.xticks(rotation=45, ha="right")
-        plt.ylabel("Revenue (R)")
-        plt.title("Total Revenue per Product — Thabo's Corner Store")
-        plt.tight_layout()
-        plt.savefig(save_path)
-        plt.close()
+        Use matplotlib to create a bar chart.
+        Label the axes and add a title.
     """
-    raise NotImplementedError
+
+    import matplotlib.pyplot as plt
+
+    # TODO: Create the bar chart.
+    plt.figure(figsize=(12, 6))
+    plt.bar(names, revenues)
+
+    # TODO: Add the title and axis labels.
+    plt.title("Total Revenue per Product")
+    plt.xlabel("Product Name")
+    plt.ylabel("Revenue (R)")
+
+    # TODO: Make product names readable.
+    plt.xticks(rotation=45, ha="right")
+
+    # TODO: Adjust the layout and display the chart.
+    plt.tight_layout()
+    plt.show()
 
 
-def line_chart_monthly_trend(monthly_trend: dict, save_path: str = "monthly_trend.png"):
+
+
+def line_chart_monthly_trend(trend):
     """
-    Create and save a line chart of total quantity sold per month.
-
-    Args:
-        monthly_trend: a dict like {"2026-01": 143, "2026-02": 97}
-            (this is exactly what analysis.monthly_sales_trend() returns)
-        save_path: where to save the .png file
+    Create a line chart showing monthly sales trends.
 
     TODO:
-        months = list(monthly_trend.keys())
-        totals = list(monthly_trend.values())
-        plt.figure(figsize=(8, 5))
-        plt.plot(months, totals, marker="o")
-        plt.ylabel("Units Sold")
-        plt.title("Monthly Sales Trend — Thabo's Corner Store")
-        plt.tight_layout()
-        plt.savefig(save_path)
-        plt.close()
+        Extract the months and sales quantities.
+        Plot the monthly trend using matplotlib.
+        Add a title and axis labels.
     """
-    raise NotImplementedError
+
+    import matplotlib.pyplot as plt
+
+    # TODO: Extract the months and quantities.
+    months = sorted(trend.keys())
+    quantities = [trend[month] for month in months]
+
+    # TODO: Create the line chart.
+    plt.figure(figsize=(10, 6))
+    plt.plot(months, quantities, marker="o", linestyle="-")
+
+    # TODO: Add chart title and labels.
+    plt.title("Monthly Sales Trend")
+    plt.xlabel("Month")
+    plt.ylabel("Total Quantity Sold")
+
+    # TODO: Display the sales values.
+    for month, quantity in zip(months, quantities):
+        plt.annotate(
+            str(quantity),
+            (month, quantity),
+            textcoords="offset points",
+            xytext=(0, 10),
+            ha="center"
+        )
+
+    # TODO: Adjust layout and display chart.
+    plt.tight_layout()
+    plt.show()
