@@ -303,11 +303,7 @@ Average basket size: 2.23
 
 [5/5] Generating charts...
 Charts saved as revenue_per_product.png and monthly_trend.png
-
-Done! Don't forget to commit and push your progress to GitHub.
 ```
-
-The project ran to completion without a Python exception after successful password authentication. All five SQL query outputs are now documented. Before final submission, verify the chart filenames and test that three incorrect passwords prevent the reports from running.
 
 ## Version control
 
