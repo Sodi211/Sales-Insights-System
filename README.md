@@ -154,7 +154,13 @@ ORDER BY units_sold DESC, p.product_name
 LIMIT 1;
 ```
 
-**Result:** To be pasted from the database query output; not yet provided.
+**Actual result:**
+
+| Product | Units sold |
+|---|---:|
+| Bar One Chocolate | 16 |
+
+Bar One Chocolate sold the most units (16). This differs from the highest-revenue product, 5kg Maize Meal.
 
 ### Query 3: Sales by payment method
 
@@ -166,7 +172,16 @@ FROM sales
 GROUP BY payment_method;
 ```
 
-**Result:** To be pasted from the database query output; not yet provided.
+**Actual results:**
+
+| Payment method | Transactions |
+|---|---:|
+| Card | 10 |
+| Cash | 14 |
+| Mobile Money | 11 |
+| Unknown | 8 |
+
+Cash was the most common recorded payment method. Eight transactions had missing payment information that was classified as `Unknown` during cleaning.
 
 ### Query 4: Revenue by product category
 
@@ -179,7 +194,18 @@ GROUP BY p.category
 ORDER BY revenue DESC, p.category;
 ```
 
-**Result:** To be pasted from the database query output; not yet provided.
+**Actual results:**
+
+| Product category | Revenue (R) |
+|---|---:|
+| Household | 1,021.50 |
+| Dairy | 493.00 |
+| Snacks | 356.00 |
+| Beverages | 333.00 |
+| Airtime & Data | 238.00 |
+| Bakery | 48.00 |
+
+Household products generated the highest revenue in the cleaned data.
 
 ### Query 5: Five highest-revenue sales days
 
@@ -194,11 +220,21 @@ ORDER BY revenue DESC, s.sale_date
 LIMIT 5;
 ```
 
-**Result:** To be pasted from the database query output; not yet provided.
+**Actual results:**
 
-### Getting the missing query results
+| Date | Transactions | Revenue (R) |
+|---|---:|---:|
+| 2026-01-07 | 2 | 534.00 |
+| 2026-01-22 | 1 | 178.00 |
+| 2026-01-03 | 2 | 122.00 |
+| 2026-01-12 | 1 | 98.00 |
+| 2026-02-13 | 1 | 98.00 |
 
-With the project in its current state, the quickest way is to open `store.db` in DB Browser for SQLite, paste each SQL query above into **Execute SQL**, run it, and copy the resulting rows into this README. Alternatively, call the matching functions from Python: `query_best_selling_product`, `query_sales_by_payment_method`, `query_custom_one`, and `query_custom_two`.
+7 January 2026 had the highest revenue among the sales dates shown (R534 across two transactions).
+
+### SQL query evidence
+
+All five queries above were executed successfully using `python main.py`. The tables reproduce the actual terminal output. The first query groups by product ID, so `Coca-Cola 500ml` appears twice for two separate product IDs; this is retained exactly as returned by SQLite.
 
 ## Task 4: Sales analysis
 
@@ -244,6 +280,16 @@ I completed `security.py` using `hash_password()`, `check_password()`, and `logi
 
 **3. Availability:** Because the system runs on my laptop, hardware failure, theft, or accidental deletion could make the reports unavailable. I would make regular backups of the SQLite database and source files to a secure location, and test that those backups can be restored when needed.
 
+## Task 7: Key Business Insights — Advice for Thabo
+
+After looking at the sales records, I found a few things that could help Thabo decide what to stock and how to improve sales. The **5kg Maize Meal** brought in the most revenue at **R801**, followed by **Eggs (6 pack)** at **R364**. However, **Bar One Chocolate** was the product customers bought in the largest quantity, with **16 units sold**. This tells me that the product making the most money is not always the one selling the most units. Thabo should keep an eye on both when ordering stock.
+
+The **Household** category brought in the most revenue, at **R1,021.50**. Cash was the most common payment method, with **14 transactions**, although **8 transactions** had no recorded payment method. I would recommend making sure the payment method is captured every time, so the reports become more useful.
+
+The sales records show **52 units sold in January** and **44 in February 2026**. That is a drop of eight units, but two months of data are not enough to say exactly why it happened. Thabo could watch sales over the next few months and ask customers whether there are products they would like the shop to carry.
+
+I also noticed that **Data Bundle 1GB** was flagged as low in stock. Thabo should check whether it needs to be reordered before it runs out. The average sale was **2.23 items**, so small offers on products that go well together might encourage customers to buy more. Overall, I would suggest using these reports regularly to make practical stock and sales decisions, while also checking profit rather than revenue alone.
+
 ## Final run and project status
 
 The final terminal output ended with:
@@ -257,9 +303,11 @@ Average basket size: 2.23
 
 [5/5] Generating charts...
 Charts saved as revenue_per_product.png and monthly_trend.png
+
+Done! Don't forget to commit and push your progress to GitHub.
 ```
 
-The project ran to completion without a Python exception after successful password authentication. To finish the assessment evidence, add the actual output of Queries 2–5, verify the chart filenames, and test that three incorrect passwords prevent the reports from running.
+The project ran to completion without a Python exception after successful password authentication. All five SQL query outputs are now documented. Before final submission, verify the chart filenames and test that three incorrect passwords prevent the reports from running.
 
 ## Version control
 
@@ -267,6 +315,6 @@ I used Git to track my changes and pushed the completed work to GitHub:
 
 https://github.com/Sodi211/Sales-Insights-System
 
-### Previous GitHub update
+### Latest confirmed GitHub update
 
-The `.gitignore` file was updated to exclude `store_backup.db`, preserving the old database locally without adding it to GitHub. Commit `d30c24c` was previously pushed to `origin/main`. The new Task 6 documentation and code should be committed and pushed after testing.
+Task 6 was committed and pushed to `main` as commit `6286695` (`Complete Task 6 security gate and CIA triad reflection`). The Task 7 README update with all five query results should be committed separately. Git line-ending (LF/CRLF) warnings on Windows are informational, not errors.
