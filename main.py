@@ -63,6 +63,26 @@ def main():
     for row in database.query_total_revenue_per_product(conn):
         print("   ", row)
 
+    # SQL Query 2: Best-selling product
+    print("\nSQL Query 2 — Best-selling product:")
+    for row in database.query_best_selling_product(conn):
+        print("   ", row)
+
+    # SQL Query 3: Sales by payment method
+    print("\nSQL Query 3 — Sales by payment method:")
+    for row in database.query_sales_by_payment_method(conn):
+        print("   ", row)
+
+    # SQL Query 4: Revenue by product category
+    print("\nSQL Query 4 — Revenue by category:")
+    for row in database.query_custom_one(conn):
+        print("   ", row)
+
+    # SQL Query 5: Top five sales days
+    print("\nSQL Query 5 — Top five sales days:")
+    for row in database.query_custom_two(conn):
+        print("   ", row)
+
     # ---- Task 4: programming logic / analysis -----------------------
     print("\n[4/5] Running analysis...")
     sales_records = clean_sales.to_dict("records")
