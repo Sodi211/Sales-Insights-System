@@ -1,3 +1,4 @@
+
 """
 security.py
 ------------
@@ -18,13 +19,15 @@ IMPORTANT SECURITY LESSON (this is the whole point of the task):
 
 import hashlib
 import getpass
+import hmac
 
 
 # In a real system this would live in a database, not in code.
 # For this project, one hardcoded hash is fine — but note in your
 # README why storing it in the database (KM-04 idea) would be better
 # than hardcoding it here.
-STORED_PASSWORD_HASH = None  # TODO: set this using hash_password() below
+STORED_PASSWORD_HASH = "d39e4d186c863606a409d15f6a56fa87146a51eb2cdf0f318bb9a2a3c6dd79c1"
+  # TODO: set this using hash_password() below
 
 
 def hash_password(plain_text_password: str) -> str:
@@ -42,7 +45,9 @@ def hash_password(plain_text_password: str) -> str:
     TODO:
         return hashlib.sha256(plain_text_password.encode()).hexdigest()
     """
-    raise NotImplementedError
+    return hashlib.sha256(
+        plain_text_password.encode("utf-8")
+    ).hexdigest()
 
 
 def check_password(attempt: str, stored_hash: str) -> bool:
@@ -60,7 +65,10 @@ def check_password(attempt: str, stored_hash: str) -> bool:
     TODO:
         return hash_password(attempt) == stored_hash
     """
-    raise NotImplementedError
+    return hmac.compare_digest(
+        hash_password(attempt),
+        stored_hash
+    )
 
 
 def login_gate(stored_hash: str, max_attempts: int = 3) -> bool:
@@ -74,7 +82,7 @@ def login_gate(stored_hash: str, max_attempts: int = 3) -> bool:
 
     TODO:
         for attempt_number in range(max_attempts):
-            attempt = getpass.getpass("Enter password to view reports: ")
+            attempt = input("Enter password to view reports: ")
             if check_password(attempt, stored_hash):
                 print("Access granted.")
                 return True
@@ -83,7 +91,19 @@ def login_gate(stored_hash: str, max_attempts: int = 3) -> bool:
         print("Access denied — too many failed attempts.")
         return False
     """
-    raise NotImplementedError
+    for attempt_number in range(max_attempts):
+        attempt = input(
+            "Enter password to view reports: "
+        )
+
+        if check_password(attempt, stored_hash):
+            print("Access granted.")
+            return True
+        else:
+            print("Incorrect password. Try again.")
+
+    print("Access denied — too many failed attempts.")
+    return False
 
 
 # ---------------------------------------------------------------------

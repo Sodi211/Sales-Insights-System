@@ -4,7 +4,7 @@
 
 This project uses Python, pandas, SQLite, and matplotlib to turn Thabo's Corner Store's raw product and sales records into useful business insights. It loads and cleans the source CSV files, builds a relational database, runs SQL queries, calculates sales statistics, and generates charts.
 
-The project started from a supplied scaffold with function signatures and TODO comments. I completed the database, analysis, and visualisation logic and tested the full pipeline using `python main.py`.
+The project started from a supplied scaffold with function signatures and TODO comments. I completed the database, analysis, visualisation, and password-access logic and tested the pipeline using `python main.py`.
 
 ## Folder structure
 
@@ -51,7 +51,7 @@ Open a terminal inside `Sales Insights System` and run:
 python main.py
 ```
 
-The program loads the data, cleans it, builds `store.db`, prints a sample SQL query and analysis results, and generates the charts. Close the chart windows if needed to let the program finish.
+The program first requests a report password. Only after successful authentication does it load and clean the data, build `store.db`, print SQL and analysis results, and generate the charts. The password is not included in this README. Close the chart windows if needed to let the program finish.
 
 ## Task 2: Data cleaning findings
 
@@ -228,9 +228,21 @@ I created two charts using matplotlib:
 
 Both charts were displayed successfully during the final run of the program.
 
-## Task 6: Security
+## Task 6: Data security gate
 
-The scaffold includes `security.py` for login and password-hashing work. The successful terminal run shown here does not establish that the security functions were executed or tested, so this README does not claim that Task 6 is complete.
+I completed `security.py` using `hash_password()`, `check_password()`, and `login_gate()`. The password is checked using SHA-256 hashes; the original password is not stored in the source code. The comparison uses `hmac.compare_digest`, and the login gate allows a maximum of three attempts. I enabled the gate in `main.py` before the data-loading, SQL reporting, analysis, and chart-generation steps.
+
+**Successful test:** Running `python main.py` prompted for a password. After I entered the correct password, the terminal displayed `Access granted.` and all five processing stages finished, including generating the two charts. This confirms the authorised-access path. The three-failed-attempts path should also be tested before final submission; it is not shown in the available terminal output.
+
+**Security limitations:** This is an educational example. Unsalted SHA-256 is not recommended for storing real user passwords; production systems should use a password-specific salted hashing algorithm such as Argon2id or scrypt. The login gate protects the application workflow but does not encrypt the SQLite database or existing chart image files. Password entry should use `getpass.getpass()` rather than visible `input()` for the final version. Never publish the actual password or hash in the README.
+
+### CIA-triad reflection (Task 6; 209 words)
+
+**1. Confidentiality:** In my Sales Insights System, confidentiality means keeping Thabo’s business reports away from people who are not authorised to view them. I added a login gate in `security.py` and connected it to `main.py` before the data-loading and reporting stages. The program uses SHA-256 to hash the password entered by a user and compares that hash with the stored hash, rather than comparing plain-text passwords. It allows three attempts before denying access. For a real application, I would store a properly salted password hash in a protected database instead of keeping a fixed hash in the source code.
+
+**2. Integrity:** The login gate controls access but does not ensure that the records themselves are accurate. In `database.py`, primary keys uniquely identify products and sales, while a foreign key links each sale to a product. Appropriate column types help keep quantities and prices consistent. I also cleaned the CSV files before importing them, removing invalid records that could distort the analysis.
+
+**3. Availability:** Because the system runs on my laptop, hardware failure, theft, or accidental deletion could make the reports unavailable. I would make regular backups of the SQLite database and source files to a secure location, and test that those backups can be restored when needed.
 
 ## Final run and project status
 
@@ -245,6 +257,9 @@ Average basket size: 2.23
 
 [5/5] Generating charts...
 Charts saved as revenue_per_product.png and monthly_trend.png
+```
+
+The project ran to completion without a Python exception after successful password authentication. To finish the assessment evidence, add the actual output of Queries 2–5, verify the chart filenames, and test that three incorrect passwords prevent the reports from running.
 
 ## Version control
 
@@ -252,6 +267,6 @@ I used Git to track my changes and pushed the completed work to GitHub:
 
 https://github.com/Sodi211/Sales-Insights-System
 
-### Latest GitHub update
+### Previous GitHub update
 
-The `.gitignore` file was updated to exclude `store_backup.db`, preserving the old database locally without adding it to GitHub. Commit `d30c24c` was successfully pushed to `origin/main`. The final `git status` reported `nothing to commit, working tree clean`.
+The `.gitignore` file was updated to exclude `store_backup.db`, preserving the old database locally without adding it to GitHub. Commit `d30c24c` was previously pushed to `origin/main`. The new Task 6 documentation and code should be committed and pushed after testing.

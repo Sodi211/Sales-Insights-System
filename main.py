@@ -34,13 +34,12 @@ def main():
     print("Thabo's Corner Store — Sales Insights System")
     print("=" * 60)
 
-    # ---- Task 6: security gate -------------------------------------
-    # TODO: once you've set security.STORED_PASSWORD_HASH to a real
-    # hash (e.g. security.hash_password("letmein")), uncomment this
-    # block so reports require a password before they are shown.
-    #
-    # if not security.login_gate(security.STORED_PASSWORD_HASH):
-    #     return
+    # ---- Task 6: security gate -------------------------
+    # Require a password before accessing sales reports
+    if not security.login_gate(security.STORED_PASSWORD_HASH):
+        print("Access denied. You cannot view the sales reports.")
+        return
+
 
     # ---- Task 2: load & clean data ----------------------------------
     print("\n[1/5] Loading raw data...")
